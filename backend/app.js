@@ -8,7 +8,7 @@ const useragent = require("express-useragent");
 const geoip = require("geoip-lite");
 
 const { setupRoutes } = require("./Routes/setupRoutes");
-const pdb = require("./postDatabase");
+//const pdb = require("./postDatabase");
 const infoRoutes = require("./infoRoutes");
 const { setupModels } = require("./Models/setModels");
 
@@ -67,12 +67,13 @@ app.use("/", infoRoutes);
 setupRoutes(app);
 
 setupModels();
+app.listen(process.env.APP_PORT);
 
-pdb
-  .sync()
-  .then(() => {
-    app.listen(process.env.APP_PORT);
-    console.log(`Lisining to the port : ${process.env.APP_PORT}`);
-    //console.log("Alter is on for the databases");
-  })
-  .catch((err) => console.log(err));
+// pdb
+//   .sync()
+//   .then(() => {
+//     app.listen(process.env.APP_PORT);
+//     console.log(`Lisining to the port : ${process.env.APP_PORT}`);
+//     //console.log("Alter is on for the databases");
+//   })
+//   .catch((err) => console.log(err));
