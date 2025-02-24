@@ -71,7 +71,7 @@ setupModels();
 //app.listen(process.env.APP_PORT);
 
 db
-  .sync()
+  .sync({alter:true})
   .then(() => {
     app.listen(process.env.APP_PORT);
     console.log(`Lisining to the port : ${process.env.APP_PORT}`);
