@@ -1,0 +1,3 @@
+
+
+exports.baseDir=__dirname;
