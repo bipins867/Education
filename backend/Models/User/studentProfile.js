@@ -2,30 +2,15 @@ const Sequelize = require("sequelize");
 const { sequelize } = require("../../importantInfo");
 
 
-const UserProfile = sequelize.define(
-  "UserProfile",
+const StudentProfile = sequelize.define(
+  "StudentProfile",
   {
     id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    name: {
-      type: Sequelize.STRING,
-      allowNull: true,
-    },
-    email: {
-      type: Sequelize.STRING,
-      allowNull: true,
-      unique: true, // Ensuring email uniqueness
-      validate: {
-        isEmail: true, // Validates email format
-      },
-    },
-    profileUrl: {
-      type: Sequelize.STRING,
-      allowNull: true,
-    },
+    
     rollNumber: {
       type: Sequelize.STRING,
       allowNull: true,
@@ -42,8 +27,8 @@ const UserProfile = sequelize.define(
   },
   {
     timestamps: true, // Adds createdAt and updatedAt fields
-    tableName: "userProfile", // Explicitly defining table name
+    tableName: "studentProfile", // Explicitly defining table name
   }
 );
 
-module.exports = UserProfile;
+module.exports = StudentProfile;
