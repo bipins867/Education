@@ -9,8 +9,8 @@ const router = express.Router();
 
 router.post(
   "/login",
-  middlewareSendOtp,
-  middlewareVerifyOtp,
+  // middlewareSendOtp,
+  // middlewareVerifyOtp,
   usersAuthController.userAuth
 );
 
