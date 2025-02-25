@@ -8,8 +8,8 @@ const useragent = require("express-useragent");
 const geoip = require("geoip-lite");
 
 const { setupRoutes } = require("./Routes/setupRoutes");
-const pdb = require("./postDatabase");
-//const db=require('./database');
+//const pdb = require("./postDatabase");
+const db=require('./database');
 const infoRoutes = require("./infoRoutes");
 const { setupModels } = require("./Models/setModels");
 
@@ -72,7 +72,7 @@ setupRoutes(app);
 setupModels();
 //app.listen(process.env.APP_PORT);
 
-pdb
+db
   .sync()
   .then(() => {
     app.listen(process.env.APP_PORT);
