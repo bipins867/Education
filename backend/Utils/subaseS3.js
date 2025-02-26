@@ -3,8 +3,10 @@ const supabase = require("../supabaseClient");
 exports.uploadFile = async (file, fileName) => {
   const { data, error } = await supabase.storage
     .from(process.env.SUPABASE_BUCCKET)
-    .upload(fileName, file);
-
+    .upload(fileName, file.buffer, {
+      contentType: file.mimetype,
+    });
+   
   if (error) {
     return error;
   } else {

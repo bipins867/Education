@@ -21,8 +21,8 @@ const Series = sequelize.define(
       defaultValue: 0,
     },
     validity: {
-      type: DataTypes.DATE,
-      allowNull: false,
+      type: DataTypes.STRING,
+      
     },
     description: { type: DataTypes.TEXT },
   },

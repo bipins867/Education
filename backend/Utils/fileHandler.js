@@ -1,30 +1,40 @@
 const multer = require("multer");
 const fs = require("fs");
-const path=require('path');
-const { baseDir } = require("../importantInfo");
+const path = require("path");
+const { baseDir, storageUseType } = require("../importantInfo");
+const { uploadFile } = require("./subaseS3");
 
 function createFilePath(filePath) {
   if (!fs.existsSync(filePath)) {
     fs.mkdirSync(filePath, { recursive: true });
   }
 }
-exports.saveFile = (file, dir, name) => {
-  const newDir=path.join(baseDir,dir)
-  if (file) {
-    const ext = path.extname(file.originalname);
-    const filePath = path.join(newDir, `${name}${ext}`);
-
-    createFilePath(newDir);
-    fs.writeFileSync(filePath, file.buffer); // Save the file
+exports.saveFile = async (file, dir, name) => {
+  if (storageUseType === "supabase") {
     
-    return path.join("files", dir, `${name}${ext}`).replace(/\\/g, "/");
+    if (file) {
+      const ext = path.extname(file.originalname);
+      let filename = path.join(dir, `${name}${ext}`).replace(/\\/g, "/");
+
+      return await uploadFile(file, filename);
+    }
+  } else {
+    const newDir = path.join(baseDir, dir);
+    if (file) {
+      const ext = path.extname(file.originalname);
+      const filePath = path.join(newDir, `${name}${ext}`);
+
+      createFilePath(newDir);
+      fs.writeFileSync(filePath, file.buffer); // Save the file
+
+      return path.join("files", dir, `${name}${ext}`).replace(/\\/g, "/");
+    }
   }
 };
 
-
-exports.setFileSizeLimit = ({ fileSizeLimit = 0.5 ,fileName=""}) => {
+exports.setFileSizeLimit = ({ fileSizeLimit = 0.5, fileName = "" }) => {
   return (req, res, next) => {
-    req.fileName=fileName
+    req.fileName = fileName;
     req.fileSizeLimit = fileSizeLimit * 1024 * 1024; // Convert MB to bytes
     next();
   };
@@ -53,11 +63,9 @@ exports.singleFileHandler = (fileName) => {
   }).fields(fields);
 };
 
-
-exports.checkFileExist=(req,res,next)=>{
-  
-  if(req.fileName){
+exports.checkFileExist = (req, res, next) => {
+  if (req.fileName) {
     return next();
   }
-  res.status(404).json({error:"File not Found!"})
-}
+  res.status(404).json({ error: "File not Found!" });
+};

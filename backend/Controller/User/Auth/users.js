@@ -23,7 +23,7 @@ exports.userAuth = async (req, res) => {
     // Generate JWT token
     const expiresIn = process.env.NODE_ENV === "testing" ? "30d" : "7d";
     const token = jwt.sign(
-      { userId: user.id, phone: user.phone },
+      { id: user.id, phone: user.phone },
       process.env.JWT_SECRET_KEY,
       { expiresIn } // Token valid for 7 days
     );

@@ -1,4 +1,8 @@
-const { sequelize } = require("../../../../../importantInfo");
+const {
+  sequelize,
+  storageUseType,
+  S3_FILE_PATH,
+} = require("../../../../../importantInfo");
 const { v4: uuidv4 } = require("uuid");
 const { saveFile } = require("../../../../../Utils/fileHandler");
 const path = require("path");
@@ -8,7 +12,6 @@ const Series = require("../../../../../Models/TestSeries/Series");
 const Test = require("../../../../../Models/TestSeries/Test");
 const Question = require("../../../../../Models/TestSeries/Question");
 const Option = require("../../../../../Models/TestSeries/Option");
-const TeacherProfile = require("../../../../../Models/TeacherProfile");
 
 // Create Category (Linked to TeacherProfile)
 exports.createCategory = async (req, res, next) => {
@@ -22,13 +25,21 @@ exports.createCategory = async (req, res, next) => {
         .status(400)
         .json({ success: false, message: "Name is required" });
 
-    let imageUrl = "";
+    let imageData;
     if (imageFile) {
-      imageUrl = saveFile(
+      imageData = await saveFile(
         imageFile,
         path.join("CustomFiles", "Categories"),
         uuidv4()
       );
+    }
+    let imageUrl = "";
+    if (imageData) {
+      if (storageUseType === "supabase") {
+        imageUrl = `${S3_FILE_PATH}/${imageData.path}`;
+      } else {
+        imageUrl = imageData;
+      }
     }
 
     const category = await Category.create({
@@ -43,6 +54,7 @@ exports.createCategory = async (req, res, next) => {
       data: category,
     });
   } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Internal server error", error });
@@ -67,13 +79,21 @@ exports.createSeries = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "Category not found" });
 
-    let imageUrl = "";
+    let imageData;
     if (imageFile) {
-      imageUrl = saveFile(
+      imageData = await saveFile(
         imageFile,
-        path.join("CustomFiles", "Series"),
+        path.join("CustomFiles", "Categories"),
         uuidv4()
       );
+    }
+    let imageUrl = "";
+    if (imageData) {
+      if (storageUseType === "supabase") {
+        imageUrl = `${S3_FILE_PATH}/${imageData.path}`;
+      } else {
+        imageUrl = imageData;
+      }
     }
 
     const series = await Series.create({
@@ -116,13 +136,21 @@ exports.createTest = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "Series not found" });
 
-    let imageUrl = "";
+    let imageData;
     if (imageFile) {
-      imageUrl = saveFile(
+      imageData = await saveFile(
         imageFile,
-        path.join("CustomFiles", "Tests"),
+        path.join("CustomFiles", "Categories"),
         uuidv4()
       );
+    }
+    let imageUrl = "";
+    if (imageData) {
+      if (storageUseType === "supabase") {
+        imageUrl = `${S3_FILE_PATH}/${imageData.path}`;
+      } else {
+        imageUrl = imageData;
+      }
     }
 
     const test = await Test.create({
@@ -166,13 +194,21 @@ exports.createQuestion = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "Test not found" });
 
-    let imageUrl = "";
+    let imageData;
     if (imageFile) {
-      imageUrl = saveFile(
+      imageData = await saveFile(
         imageFile,
-        path.join("CustomFiles", "Questions"),
+        path.join("CustomFiles", "Categories"),
         uuidv4()
       );
+    }
+    let imageUrl = "";
+    if (imageData) {
+      if (storageUseType === "supabase") {
+        imageUrl = `${S3_FILE_PATH}/${imageData.path}`;
+      } else {
+        imageUrl = imageData;
+      }
     }
 
     const question = await Question.create({ text, weight, imageUrl, TestId });
@@ -207,13 +243,21 @@ exports.createOption = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "Question not found" });
 
-    let imageUrl = "";
+    let imageData;
     if (imageFile) {
-      imageUrl = saveFile(
+      imageData = await saveFile(
         imageFile,
-        path.join("CustomFiles", "Options"),
+        path.join("CustomFiles", "Categories"),
         uuidv4()
       );
+    }
+    let imageUrl = "";
+    if (imageData) {
+      if (storageUseType === "supabase") {
+        imageUrl = `${S3_FILE_PATH}/${imageData.path}`;
+      } else {
+        imageUrl = imageData;
+      }
     }
 
     const option = await Option.create({ text, imageUrl, QuestionId });

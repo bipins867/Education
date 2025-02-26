@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Admin = require("../Models/User/admins");
-
-
+const User = require("../Models/User/users");
 
 exports.adminAuthentication = async (req, res, next) => {
   try {
@@ -28,7 +27,6 @@ exports.adminAuthentication = async (req, res, next) => {
         .json({ error: "Access denied. Admin account is Deactivated!" });
     }
 
-
     // Check freeze status for admin types 'SA' and 'A'
     if (
       (admin.adminType === "SA" || admin.adminType === "A") &&
@@ -49,3 +47,29 @@ exports.adminAuthentication = async (req, res, next) => {
   }
 };
 
+exports.userAuthentication = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization;
+    const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    
+  
+    const user = await User.findByPk(payload.id);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found!" });
+    }
+
+    if (user.isBlocked) {
+      return res.status(402).json({
+        error:
+          "User Account is blocked. Please contact customer support for any query!",
+      });
+    }
+
+    req.user = user;
+
+    next();
+  } catch (err) {
+    return res.status(503).json({ error: "Invalid Signature!" });
+  }
+};
