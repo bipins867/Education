@@ -4,10 +4,10 @@ const getController = require("../../../../../Controller/User/Teacher/TestSeries
 
 const router = express.Router();
 
-router.post("/category", getController.getCategory);
+router.post("/categories", getController.getCategories);
 router.post("/series", getController.getSeries);
-router.post("/test", getController.getTest);
-router.post("/question", getController.getQuestion);
-router.post("/option", getController.getOption);
+router.post("/tests", getController.getTests);
+router.post("/questions", getController.getQuestions);
+router.post("/options", getController.getOptions);
 
 module.exports = router;
