@@ -13,7 +13,6 @@ const Test = require("../../../../../Models/TestSeries/Test");
 const Question = require("../../../../../Models/TestSeries/Question");
 const Option = require("../../../../../Models/TestSeries/Option");
 
-// Create Category (Linked to TeacherProfile)
 exports.createCategory = async (req, res, next) => {
   try {
     const { name } = req.body;
@@ -61,7 +60,6 @@ exports.createCategory = async (req, res, next) => {
   }
 };
 
-// Create Series (Linked to Category)
 exports.createSeries = async (req, res, next) => {
   try {
     const { title, description, price, validity, CategoryId } = req.body;
@@ -117,7 +115,6 @@ exports.createSeries = async (req, res, next) => {
   }
 };
 
-// Create Test (Linked to Series)
 exports.createTest = async (req, res, next) => {
   try {
     const { title, type, totalQuestions, totalMarks, time, isPaid, SeriesId } =
@@ -176,7 +173,6 @@ exports.createTest = async (req, res, next) => {
   }
 };
 
-// Create Question (Linked to Test)
 exports.createQuestion = async (req, res, next) => {
   try {
     const { text, weight, TestId } = req.body;
@@ -225,7 +221,6 @@ exports.createQuestion = async (req, res, next) => {
   }
 };
 
-// Create Option (Linked to Question)
 exports.createOption = async (req, res, next) => {
   try {
     const { text, QuestionId } = req.body;
