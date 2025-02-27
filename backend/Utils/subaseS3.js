@@ -49,9 +49,10 @@ exports.downloadFile = async (fileName) => {
 };
 
 exports.deleteFile = async (fileName) => {
+  const newFileName = fileName.replace(S3_FILE_PATH + "/", "");
   const { data, error } = await supabase.storage
     .from(process.env.SUPABASE_BUCCKET)
-    .remove([fileName]);
+    .remove([newFileName]);
 
   if (error) {
     return error;
