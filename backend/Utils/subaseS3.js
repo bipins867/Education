@@ -1,3 +1,4 @@
+const { S3_FILE_PATH } = require("../importantInfo");
 const supabase = require("../supabaseClient");
 
 exports.uploadFile = async (file, fileName) => {
@@ -6,7 +7,7 @@ exports.uploadFile = async (file, fileName) => {
     .upload(fileName, file.buffer, {
       contentType: file.mimetype,
     });
-   
+
   if (error) {
     return error;
   } else {
@@ -59,10 +60,24 @@ exports.deleteFile = async (fileName) => {
   }
 };
 
-exports.updateFile = async (file, fileName) => {
-  await supabase.storage.from(process.env.SUPABASE_BUCCKET).remove([fileName]);
+exports.updateFile = async (file, fileName, oldFile) => {
+  if (oldFile) {
+    const newFileName = oldFile.replace(S3_FILE_PATH + "/", "");
 
-  await supabase.storage
+    await supabase.storage
+      .from(process.env.SUPABASE_BUCCKET)
+      .remove([newFileName]);
+  }
+
+  const { data, error } = await supabase.storage
     .from(process.env.SUPABASE_BUCCKET)
-    .upload(fileName, file);
+    .upload(fileName, file.buffer, {
+      contentType: file.mimetype,
+    });
+
+  if (error) {
+    return error;
+  } else {
+    return data;
+  }
 };

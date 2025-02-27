@@ -2,21 +2,26 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { baseDir, storageUseType } = require("../importantInfo");
-const { uploadFile } = require("./subaseS3");
+const { uploadFile, updateFile } = require("./subaseS3");
 
 function createFilePath(filePath) {
   if (!fs.existsSync(filePath)) {
     fs.mkdirSync(filePath, { recursive: true });
   }
 }
-exports.saveFile = async (file, dir, name) => {
+exports.saveFile = async (file, dir, name,replace = false,oldFile=null) => {
   if (storageUseType === "supabase") {
     
     if (file) {
       const ext = path.extname(file.originalname);
       let filename = path.join(dir, `${name}${ext}`).replace(/\\/g, "/");
-
-      return await uploadFile(file, filename);
+      if(replace){
+        return await updateFile(file,filename,oldFile);
+      }
+      else{
+        return await uploadFile(file, filename);
+      }
+      
     }
   } else {
     const newDir = path.join(baseDir, dir);
