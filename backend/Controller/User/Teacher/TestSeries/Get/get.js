@@ -34,6 +34,7 @@ exports.getSeries = async (req, res) => {
 
     if (id) whereClause.id = id;
     if (CategoryId) whereClause.CategoryId = CategoryId;
+    whereClause.UserId=req.user.id;
 
     const series = await Series.findAll({ where: whereClause });
 
@@ -52,7 +53,7 @@ exports.getTests = async (req, res) => {
   try {
     const { id, SeriesId } = req.body;
     let whereClause = {};
-
+    whereClause.UserId=req.user.id;
     if (id) whereClause.id = id;
     if (SeriesId) whereClause.SeriesId = SeriesId;
 
@@ -73,7 +74,7 @@ exports.getQuestions = async (req, res) => {
   try {
     const { id, TestId } = req.body;
     let whereClause = {};
-
+    whereClause.UserId=req.user.id;
     if (id) whereClause.id = id;
     if (TestId) whereClause.TestId = TestId;
 
@@ -94,7 +95,7 @@ exports.getOptions = async (req, res) => {
   try {
     const { id, QuestionId } = req.body;
     let whereClause = {};
-
+    whereClause.UserId=req.user.id;
     if (id) whereClause.id = id;
     if (QuestionId) whereClause.QuestionId = QuestionId;
 

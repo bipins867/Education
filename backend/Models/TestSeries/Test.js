@@ -29,13 +29,18 @@ const Test = sequelize.define(
       allowNull: false,
     },
     time: {
-        type:DataTypes.STRING,
-        allowNull:false
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,
+    },
+    UserId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
     },
   },
   {

@@ -22,9 +22,13 @@ const Series = sequelize.define(
     },
     validity: {
       type: DataTypes.STRING,
-      
     },
     description: { type: DataTypes.TEXT },
+    UserId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields

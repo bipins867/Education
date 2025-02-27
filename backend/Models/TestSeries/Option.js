@@ -16,6 +16,11 @@ const Option = sequelize.define(
       allowNull: false,
       defaultValue: true,
     },
+    UserId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
   },
   { timestamps: true, tableName: "options" }
 );
