@@ -3,7 +3,7 @@ const User = require("../../../Models/User/users");
 
 exports.userAuth = async (req, res) => {
   try {
-    const { phone } = req.body;
+    const { phone ,userType} = req.body;
 
     if (!phone) {
       return res
@@ -20,8 +20,12 @@ exports.userAuth = async (req, res) => {
 
     if (!user) {
       // Create a new user if not found
+      if(!userType){
+        userType='student';
+      }
       user = await User.create({
         phone,
+        userType,
       });
     }
 

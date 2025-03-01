@@ -23,10 +23,12 @@ const Test = sequelize.define(
     totalQuestions: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      defaultValue: 0,
     },
     totalMarks: {
       type: DataTypes.FLOAT,
       allowNull: false,
+      defaultValue: 0,
     },
     time: {
       type: DataTypes.STRING,

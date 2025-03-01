@@ -3,7 +3,11 @@ const TeacherProfile = require("../../../../Models/User/teacherProfile");
 exports.getProfile = async (req, res, next) => {
   try {
     const user = req.user; // Authenticated user
-
+    if (user.userType !== "teacher") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Unauthorized access" });
+    }
     // Try to fetch the existing teacher profile
     let teacherProfile = await user.getTeacherProfile();
 
@@ -19,7 +23,6 @@ exports.getProfile = async (req, res, next) => {
   }
 };
 
-
 exports.updateProfile = async (req, res, next) => {
   try {
     const user = req.user; // Authenticated user
@@ -29,14 +32,22 @@ exports.updateProfile = async (req, res, next) => {
     let teacherProfile = await user.getTeacherProfile();
 
     if (!teacherProfile) {
-      return res.status(404).json({ success: false, message: "Teacher profile not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Teacher profile not found" });
     }
 
     // Update the qualification field
     teacherProfile.qualification = qualification;
     await teacherProfile.save();
 
-    res.status(200).json({ success: true, message: "Profile updated successfully", data: teacherProfile });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Profile updated successfully",
+        data: teacherProfile,
+      });
   } catch (error) {
     console.error("Error updating teacher profile:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
