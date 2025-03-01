@@ -10,6 +10,11 @@ exports.userAuth = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Phone number is required" });
     }
+    if (phone.length !== 10) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid phone number" });
+    }
 
     let user = await User.findOne({ where: { phone } });
 

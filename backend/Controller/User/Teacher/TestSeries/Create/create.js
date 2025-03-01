@@ -71,7 +71,12 @@ exports.createSeries = async (req, res, next) => {
         .json({ success: false, message: "Title and CategoryId are required" });
 
     // Verify Category exists
-    const category = await Category.findByPk(CategoryId);
+    const category = await Category.findOne({
+      where: {
+        id: CategoryId,
+        UserId: req.user.id,
+      },
+    });
     if (!category)
       return res
         .status(404)
@@ -101,6 +106,7 @@ exports.createSeries = async (req, res, next) => {
       validity,
       imageUrl,
       CategoryId,
+      UserId: req.user.id,
     });
 
     return res.status(201).json({
@@ -109,6 +115,7 @@ exports.createSeries = async (req, res, next) => {
       data: series,
     });
   } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Internal server error", error });
@@ -127,7 +134,12 @@ exports.createTest = async (req, res, next) => {
         .json({ success: false, message: "Title and SeriesId are required" });
 
     // Verify Series exists
-    const series = await Series.findByPk(SeriesId);
+    const series = await Series.findOne({
+      where: {
+        id: SeriesId,
+        UserId: req.user.id,
+      },
+    });
     if (!series)
       return res
         .status(404)
@@ -159,6 +171,7 @@ exports.createTest = async (req, res, next) => {
       isPaid,
       imageUrl,
       SeriesId,
+      UserId: req.user.id,
     });
 
     return res.status(201).json({
@@ -184,7 +197,12 @@ exports.createQuestion = async (req, res, next) => {
         .json({ success: false, message: "Text and TestId are required" });
 
     // Verify Test exists
-    const test = await Test.findByPk(TestId);
+    const test = await Test.findOne({
+      where: {
+        id: TestId,
+        UserId: req.user.id,
+      },
+    });
     if (!test)
       return res
         .status(404)
@@ -207,7 +225,13 @@ exports.createQuestion = async (req, res, next) => {
       }
     }
 
-    const question = await Question.create({ text, weight, imageUrl, TestId });
+    const question = await Question.create({
+      text,
+      weight,
+      imageUrl,
+      TestId,
+      UserId: req.user.id,
+    });
 
     return res.status(201).json({
       success: true,
@@ -232,7 +256,12 @@ exports.createOption = async (req, res, next) => {
         .json({ success: false, message: "Text and QuestionId are required" });
 
     // Verify Question exists
-    const question = await Question.findByPk(QuestionId);
+    const question = await Question.findOne({
+      where: {
+        id: QuestionId,
+        UserId: req.user.id,
+      },
+    });
     if (!question)
       return res
         .status(404)
@@ -255,7 +284,12 @@ exports.createOption = async (req, res, next) => {
       }
     }
 
-    const option = await Option.create({ text, imageUrl, QuestionId });
+    const option = await Option.create({
+      text,
+      imageUrl,
+      QuestionId,
+      UserId: req.user.id,
+    });
 
     return res.status(201).json({
       success: true,
