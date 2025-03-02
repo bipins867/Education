@@ -19,6 +19,13 @@ exports.deleteCategory = async (req, res, next) => {
 
   try {
     const { id } = req.body;
+    if (!id) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({ success: false, message: "Category ID is required" });
+    }
+
     const category = await Category.findOne({
       where: { id: id, UserId: req.user.id },
       transaction: t,
@@ -95,6 +102,12 @@ exports.deleteSeries = async (req, res, next) => {
 
   try {
     const { id } = req.body;
+    if (!id) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({ success: false, message: "Series ID is required" });
+    }
     const series = await Series.findOne({ where: { id: id, UserId: req.user.id }, transaction: t });
 
     if (!series) {
@@ -154,10 +167,17 @@ exports.deleteSeries = async (req, res, next) => {
 };
 
 exports.deleteTest = async (req, res, next) => {
+
   const t = await sequelize.transaction();
 
   try {
     const { id } = req.body;
+    if (!id) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({ success: false, message: "Test ID is required" });
+    }
     const test = await Test.findOne({ where: { id: id, UserId: req.user.id }, transaction: t });
 
     if (!test) {
@@ -211,6 +231,12 @@ exports.deleteQuestion = async (req, res, next) => {
 
   try {
     const { id } = req.body;
+    if (!id) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({ success: false, message: "Question ID is required" });
+    }
     const question = await Question.findOne({ where: { id: id, UserId: req.user.id }, transaction: t });
 
     if (!question) {
@@ -254,6 +280,12 @@ exports.deleteOption = async (req, res, next) => {
 
   try {
     const { id } = req.body;
+    if (!id) {
+      await t.rollback();
+      return res
+        .status(400)
+        .json({ success: false, message: "Option ID is required" });
+    }
     const option = await Option.findOne({ where: { id: id, UserId: req.user.id }, transaction: t });
 
     if (!option) {
