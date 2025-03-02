@@ -1,8 +1,8 @@
 const Sequelize = require("sequelize");
 const { sequelize } = require("../../importantInfo");
 
-const TeacherProfile = sequelize.define(
-  "TeacherProfile",
+const Teacher = sequelize.define(
+  "Teacher",
   {
     id: {
       type: Sequelize.INTEGER,
@@ -16,8 +16,8 @@ const TeacherProfile = sequelize.define(
   },
   {
     timestamps: true, // Adds createdAt and updatedAt fields
-    tableName: "teacherProfile", // Explicitly defining table name
+    tableName: "teacher", // Explicitly defining table name
   }
 );
 
-module.exports = TeacherProfile;
+module.exports = Teacher;

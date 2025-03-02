@@ -9,9 +9,10 @@ const geoip = require("geoip-lite");
 
 const { setupRoutes } = require("./Routes/setupRoutes");
 //const pdb = require("./postDatabase");
-const db=require('./database');
+//const db=require('./database');
 const infoRoutes = require("./infoRoutes");
 const { setupModels } = require("./Models/setModels");
+const { sequelize } = require("./importantInfo");
 
 
 
@@ -72,7 +73,7 @@ setupRoutes(app);
 setupModels();
 //app.listen(process.env.APP_PORT);
 
-db
+sequelize
   .sync()
   .then(() => {
     app.listen(process.env.APP_PORT);

@@ -1,7 +1,8 @@
-const StudentProfile = require("../../../../Models/User/studentProfile");
+const Student = require("../../../../Models/User/student");
 
 exports.getProfile = async (req, res, next) => {
   try {
+    
     const user = req.user; // Authenticated user
 
     if (user.userType !== "student") {
@@ -10,16 +11,16 @@ exports.getProfile = async (req, res, next) => {
         .json({ success: false, message: "Unauthorized access" });
     }
     // Try to fetch the existing student profile
-    let studentProfile = await user.getStudentProfile();
+    let student = await user.getStudent();
 
     // If no profile exists, create a new one
-    if (!studentProfile) {
-      studentProfile = await StudentProfile.create({ UserId: user.id });
+    if (!student) {
+      student = await Student.create({ UserId: user.id });
     }
 
     res.status(200).json({
       success: true,
-      data: studentProfile,
+      data: student,
     });
   } catch (error) {
     console.error("Error fetching student profile:", error);
@@ -43,9 +44,9 @@ exports.updateProfile = async (req, res, next) => {
     } = req.body;
 
     // Fetch student profile
-    let studentProfile = await user.getStudentProfile();
+    let student = await user.getStudent();
 
-    if (!studentProfile) {
+    if (!student) {
       return res.status(404).json({
         success: false,
         message: "Student profile not found",
@@ -53,19 +54,18 @@ exports.updateProfile = async (req, res, next) => {
     }
 
     // Update the fields
-    studentProfile.grade = grade || studentProfile.grade;
-    studentProfile.school = school || studentProfile.school;
-    studentProfile.dateOfBirth = dateOfBirth || studentProfile.dateOfBirth;
-    studentProfile.parentContact =
-      parentContact || studentProfile.parentContact;
-    studentProfile.address = address || studentProfile.address;
+    student.grade = grade || student.grade;
+    student.school = school || student.school;
+    student.dateOfBirth = dateOfBirth || student.dateOfBirth;
+    student.parentContact = parentContact || student.parentContact;
+    student.address = address || student.address;
 
-    await studentProfile.save();
+    await student.save();
 
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      data: studentProfile,
+      data: student,
     });
   } catch (error) {
     console.error("Error updating student profile:", error);

@@ -51,8 +51,7 @@ exports.userAuthentication = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
     const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    
-  
+
     const user = await User.findByPk(payload.id);
 
     if (!user) {
@@ -71,5 +70,21 @@ exports.userAuthentication = async (req, res, next) => {
     next();
   } catch (err) {
     return res.status(503).json({ error: "Invalid Signature!" });
+  }
+};
+
+exports.studentAuthentication = async (req, res, next) => {
+  if (req.user.userType === "student") {
+    next();
+  } else {
+    return res.status(403).json({ error: "Only student can access this route" });
+  }
+};
+
+exports.teacherAuthentication = async (req, res, next) => {
+  if (req.user.userType === "teacher") {
+    next();
+  } else {
+    return res.status(403).json({ error: "Only teacher can access this route" });
   }
 };
