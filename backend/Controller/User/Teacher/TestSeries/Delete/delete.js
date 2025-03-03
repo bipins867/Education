@@ -6,6 +6,7 @@ const Question = require("../../../../../Models/TestSeries/Question");
 const Option = require("../../../../../Models/TestSeries/Option");
 const { deleteFile } = require("../../../../../Utils/subaseS3");
 const { sequelize } = require("../../../../../importantInfo");
+const { createUserActivity } = require("../../../../../Utils/activityUtils");
 
 // Helper function to delete image if exists
 async function deleteEntityImage(entity) {
@@ -15,12 +16,10 @@ async function deleteEntityImage(entity) {
 }
 
 exports.deleteCategory = async (req, res, next) => {
-  const t = await sequelize.transaction();
-
+  let t;
   try {
     const { id } = req.body;
     if (!id) {
-      await t.rollback();
       return res
         .status(400)
         .json({ success: false, message: "Category ID is required" });
@@ -28,37 +27,33 @@ exports.deleteCategory = async (req, res, next) => {
 
     const category = await Category.findOne({
       where: { id: id, UserId: req.user.id },
-      transaction: t,
     });
 
     if (!category) {
-      await t.rollback();
       return res
         .status(404)
         .json({ success: false, message: "Category not found" });
     }
 
+    t = await sequelize.transaction();
+
     const series = await Series.findAll({
       where: { CategoryId: id },
-      transaction: t,
     });
 
     for (const serie of series) {
       const tests = await Test.findAll({
         where: { SeriesId: serie.id },
-        transaction: t,
       });
 
       for (const test of tests) {
         const questions = await Question.findAll({
           where: { TestId: test.id },
-          transaction: t,
         });
 
         for (const question of questions) {
           const options = await Option.findAll({
             where: { QuestionId: question.id },
-            transaction: t,
           });
 
           for (const option of options) {
@@ -81,15 +76,22 @@ exports.deleteCategory = async (req, res, next) => {
     await deleteEntityImage(category);
     await category.destroy({ transaction: t });
 
+    await createUserActivity(
+      req,
+      "delete",
+      `Category deleted successfully Id: ${category.id}`,
+      t
+    );
+
     await t.commit();
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Category and all associated content deleted successfully",
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Category and all associated content deleted successfully",
+    });
   } catch (error) {
-    await t.rollback();
+    if (t) {
+      await t.rollback();
+    }
     console.log(error);
     return res
       .status(500)
@@ -98,20 +100,20 @@ exports.deleteCategory = async (req, res, next) => {
 };
 
 exports.deleteSeries = async (req, res, next) => {
-  const t = await sequelize.transaction();
+  let t;
 
   try {
     const { id } = req.body;
     if (!id) {
-      await t.rollback();
       return res
         .status(400)
         .json({ success: false, message: "Series ID is required" });
     }
-    const series = await Series.findOne({ where: { id: id, UserId: req.user.id }, transaction: t });
+    const series = await Series.findOne({
+      where: { id: id, UserId: req.user.id },
+    });
 
     if (!series) {
-      await t.rollback();
       return res
         .status(404)
         .json({ success: false, message: "Series not found" });
@@ -119,19 +121,18 @@ exports.deleteSeries = async (req, res, next) => {
 
     const tests = await Test.findAll({
       where: { SeriesId: id },
-      transaction: t,
     });
+
+    t = await sequelize.transaction();
 
     for (const test of tests) {
       const questions = await Question.findAll({
         where: { TestId: test.id },
-        transaction: t,
       });
 
       for (const question of questions) {
         const options = await Option.findAll({
           where: { QuestionId: question.id },
-          transaction: t,
         });
 
         for (const option of options) {
@@ -150,15 +151,22 @@ exports.deleteSeries = async (req, res, next) => {
     await deleteEntityImage(series);
     await series.destroy({ transaction: t });
 
+    await createUserActivity(
+      req,
+      "delete",
+      `Series deleted successfully Id: ${series.id}`,
+      t
+    );
+
     await t.commit();
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Series and all associated content deleted successfully",
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Series and all associated content deleted successfully",
+    });
   } catch (error) {
-    await t.rollback();
+    if (t) {
+      await t.rollback();
+    }
     console.log(error);
     return res
       .status(500)
@@ -167,21 +175,21 @@ exports.deleteSeries = async (req, res, next) => {
 };
 
 exports.deleteTest = async (req, res, next) => {
-
-  const t = await sequelize.transaction();
+  let t;
 
   try {
     const { id } = req.body;
     if (!id) {
-      await t.rollback();
       return res
         .status(400)
         .json({ success: false, message: "Test ID is required" });
     }
-    const test = await Test.findOne({ where: { id: id, UserId: req.user.id }, transaction: t });
+    const test = await Test.findOne({
+      where: { id: id, UserId: req.user.id },
+      transaction: t,
+    });
 
     if (!test) {
-      await t.rollback();
       return res
         .status(404)
         .json({ success: false, message: "Test not found" });
@@ -192,10 +200,10 @@ exports.deleteTest = async (req, res, next) => {
       transaction: t,
     });
 
+    t = await sequelize.transaction();
     for (const question of questions) {
       const options = await Option.findAll({
         where: { QuestionId: question.id },
-        transaction: t,
       });
 
       for (const option of options) {
@@ -210,15 +218,22 @@ exports.deleteTest = async (req, res, next) => {
     await deleteEntityImage(test);
     await test.destroy({ transaction: t });
 
+    await createUserActivity(
+      req,
+      "delete",
+      `Test deleted successfully Id: ${test.id}`,
+      t
+    );
+
     await t.commit();
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Test and all associated content deleted successfully",
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Test and all associated content deleted successfully",
+    });
   } catch (error) {
-    await t.rollback();
+    if (t) {
+      await t.rollback();
+    }
     console.log(error);
     return res
       .status(500)
@@ -227,28 +242,29 @@ exports.deleteTest = async (req, res, next) => {
 };
 
 exports.deleteQuestion = async (req, res, next) => {
-  const t = await sequelize.transaction();
+  let t;
 
   try {
     const { id } = req.body;
     if (!id) {
-      await t.rollback();
       return res
         .status(400)
         .json({ success: false, message: "Question ID is required" });
     }
-    const question = await Question.findOne({ where: { id: id, UserId: req.user.id }, transaction: t });
+    const question = await Question.findOne({
+      where: { id: id, UserId: req.user.id },
+    });
 
     if (!question) {
-      await t.rollback();
       return res
         .status(404)
         .json({ success: false, message: "Question not found" });
     }
 
+    t = await sequelize.transaction();
+
     const options = await Option.findAll({
       where: { QuestionId: id },
-      transaction: t,
     });
 
     for (const option of options) {
@@ -259,15 +275,21 @@ exports.deleteQuestion = async (req, res, next) => {
     await deleteEntityImage(question);
     await question.destroy({ transaction: t });
 
+    await createUserActivity(
+      req,
+      "delete",
+      `Question deleted successfully Id: ${question.id}`,
+      t
+    );
     await t.commit();
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Question and all associated options deleted successfully",
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Question and all associated options deleted successfully",
+    });
   } catch (error) {
-    await t.rollback();
+    if (t) {
+      await t.rollback();
+    }
     console.log(error);
     return res
       .status(500)
@@ -276,34 +298,45 @@ exports.deleteQuestion = async (req, res, next) => {
 };
 
 exports.deleteOption = async (req, res, next) => {
-  const t = await sequelize.transaction();
+  let t;
 
   try {
     const { id } = req.body;
     if (!id) {
-      await t.rollback();
       return res
         .status(400)
         .json({ success: false, message: "Option ID is required" });
     }
-    const option = await Option.findOne({ where: { id: id, UserId: req.user.id }, transaction: t });
+    const option = await Option.findOne({
+      where: { id: id, UserId: req.user.id },
+    });
 
     if (!option) {
-      await t.rollback();
       return res
         .status(404)
         .json({ success: false, message: "Option not found" });
     }
 
+    t = await sequelize.transaction();
+
     await deleteEntityImage(option);
     await option.destroy({ transaction: t });
 
+    await createUserActivity(
+      req,
+      "delete",
+      `Option deleted successfully Id: ${option.id}`,
+      t
+    );
     await t.commit();
     return res
       .status(200)
       .json({ success: true, message: "Option deleted successfully" });
   } catch (error) {
-    await t.rollback();
+    if (t) {
+      await t.rollback();
+    }
+
     console.log(error);
     return res
       .status(500)

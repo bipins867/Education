@@ -12,8 +12,10 @@ const Series = require("../../../../../Models/TestSeries/Series");
 const Test = require("../../../../../Models/TestSeries/Test");
 const Question = require("../../../../../Models/TestSeries/Question");
 const Option = require("../../../../../Models/TestSeries/Option");
+const { createUserActivity } = require("../../../../../Utils/activityUtils");
 
 exports.createCategory = async (req, res, next) => {
+  let transaction;
   try {
     const { name } = req.body;
     const institute = req.institute;
@@ -46,18 +48,34 @@ exports.createCategory = async (req, res, next) => {
       }
     }
 
-    const category = await Category.create({
-      name,
-      imageUrl,
-      InstituteId,
-    });
+    transaction = await sequelize.transaction();
 
+    const category = await Category.create(
+      {
+        name,
+        imageUrl,
+        InstituteId,
+      },
+      { transaction }
+    );
+
+    await createUserActivity(
+      req,
+      "create",
+      `Category created successfully Id: ${category.id}`,
+      transaction
+    );
+
+    await transaction.commit();
     return res.status(201).json({
       success: true,
       message: "Category created successfully",
       data: category,
     });
   } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
     console.error("Error creating category:", error);
     return res.status(500).json({
       success: false,
@@ -68,6 +86,7 @@ exports.createCategory = async (req, res, next) => {
 };
 
 exports.createSeries = async (req, res, next) => {
+  let transaction;
   try {
     const { title, description, price, validity, CategoryId } = req.body;
     const imageFile = req.files?.image ? req.files.image[0] : null;
@@ -106,22 +125,37 @@ exports.createSeries = async (req, res, next) => {
       }
     }
 
-    const series = await Series.create({
-      title,
-      description,
-      price,
-      validity,
-      imageUrl,
-      CategoryId,
-      UserId: req.user.id,
-    });
+    transaction = await sequelize.transaction();
 
+    const series = await Series.create(
+      {
+        title,
+        description,
+        price,
+        validity,
+        imageUrl,
+        CategoryId,
+        InstituteId: req.institute.id,
+      },
+      { transaction }
+    );
+
+    await createUserActivity(
+      req,
+      "create",
+      `Series created successfully Id: ${series.id}`,
+      transaction
+    );
+    await transaction.commit();
     return res.status(201).json({
       success: true,
       message: "Series created successfully",
       data: series,
     });
   } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
     console.log(error);
     return res
       .status(500)
@@ -130,6 +164,7 @@ exports.createSeries = async (req, res, next) => {
 };
 
 exports.createTest = async (req, res, next) => {
+  let transaction;
   try {
     const { title, type, totalQuestions, totalMarks, time, isPaid, SeriesId } =
       req.body;
@@ -169,24 +204,40 @@ exports.createTest = async (req, res, next) => {
       }
     }
 
-    const test = await Test.create({
-      title,
-      type,
-      totalQuestions,
-      totalMarks,
-      time,
-      isPaid,
-      imageUrl,
-      SeriesId,
-      UserId: req.user.id,
-    });
+    transaction = await sequelize.transaction();
 
+    const test = await Test.create(
+      {
+        title,
+        type,
+        totalQuestions,
+        totalMarks,
+        time,
+        isPaid,
+        imageUrl,
+        SeriesId,
+        InstituteId: req.institute.id,
+      },
+      { transaction }
+    );
+
+    await createUserActivity(
+      req,
+      "create",
+      `Test created successfully Id: ${test.id}`,
+      transaction
+    );
+    await transaction.commit();
     return res.status(201).json({
       success: true,
       message: "Test created successfully",
       data: test,
     });
   } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Internal server error", error });
@@ -194,6 +245,7 @@ exports.createTest = async (req, res, next) => {
 };
 
 exports.createQuestion = async (req, res, next) => {
+  let transaction;
   try {
     const { text, weight, TestId } = req.body;
     const imageFile = req.files?.image ? req.files.image[0] : null;
@@ -232,20 +284,36 @@ exports.createQuestion = async (req, res, next) => {
       }
     }
 
-    const question = await Question.create({
-      text,
-      weight,
-      imageUrl,
-      TestId,
-      UserId: req.user.id,
-    });
+    transaction = await sequelize.transaction();
 
+    const question = await Question.create(
+      {
+        text,
+        weight,
+        imageUrl,
+        TestId,
+        InstituteId: req.institute.id,
+      },
+      { transaction }
+    );
+
+    await createUserActivity(
+      req,
+      "create",
+      `Question created successfully Id: ${question.id}`,
+      transaction
+    );
+    await transaction.commit();
     return res.status(201).json({
       success: true,
       message: "Question created successfully",
       data: question,
     });
   } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Internal server error", error });
@@ -253,6 +321,7 @@ exports.createQuestion = async (req, res, next) => {
 };
 
 exports.createOption = async (req, res, next) => {
+  let transaction;
   try {
     const { text, QuestionId } = req.body;
     const imageFile = req.files?.image ? req.files.image[0] : null;
@@ -291,19 +360,35 @@ exports.createOption = async (req, res, next) => {
       }
     }
 
-    const option = await Option.create({
-      text,
-      imageUrl,
-      QuestionId,
-      UserId: req.user.id,
-    });
+    transaction = await sequelize.transaction();
 
+    const option = await Option.create(
+      {
+        text,
+        imageUrl,
+        QuestionId,
+        InstituteId: req.institute.id,
+      },
+      { transaction }
+    );
+
+    await createUserActivity(
+      req,
+      "create",
+      `Option created successfully Id: ${option.id}`,
+      transaction
+    );
+    await transaction.commit();
     return res.status(201).json({
       success: true,
       message: "Option created successfully",
       data: option,
     });
   } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Internal server error", error });

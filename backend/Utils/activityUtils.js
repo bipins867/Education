@@ -1,33 +1,34 @@
 const AdminActivity = require("../Models/User/adminActivity");
 const UserActivity = require("../Models/User/userActivity");
 
-
-
 exports.createUserActivity = async (
   req,
-  user,
   activityType,
   activityDescription,
   transaction
 ) => {
+  const userType = req.userType;
+
   const activityData = {
     activityType: activityType,
     activityDescription: activityDescription,
-    ipAddress: req ? req.clientInfo.primaryIpAddress : 'N/A', // Use null if req is null
-    userAgent: req ? req.clientInfo.userAgent : 'N/A', // Use null if req is null
-    location: req ? req.clientInfo.location : 'N/A', // Use null if req is null
-    deviceType: req ? req.clientInfo.deviceType : 'N/A', // Use null if req is null
+    ipAddress: req ? req.clientInfo.primaryIpAddress : "N/A", // Use null if req is null
+    userAgent: req ? req.clientInfo.userAgent : "N/A", // Use null if req is null
+    location: req ? req.clientInfo.location : "N/A", // Use null if req is null
+    deviceType: req ? req.clientInfo.deviceType : "N/A", // Use null if req is null
     createdAt: new Date(),
-    UserId: user.id, // Link activity to the User
   };
-
+  if (userType === "institute") {
+    activityData.InstituteId = req.institute.id;
+  } else {
+    activityData.InstUserId = req.instUser.id;
+  }
   if (transaction) {
     return await UserActivity.create(activityData, { transaction });
   } else {
     return await UserActivity.create(activityData);
   }
 };
-
 
 exports.createAdminActivity = async (
   req,
@@ -40,11 +41,11 @@ exports.createAdminActivity = async (
   const activityData = {
     activityType: activityType,
     activityDescription: activityDescription,
-    affectedUserId: affectedUserName ? affectedUserName : 'N/A', // Set the affectedUserName if applicable
-    ipAddress: req ? req.clientInfo.primaryIpAddress : 'N/A', // Use null if req is null
-    userAgent: req ? req.clientInfo.userAgent : 'N/A', // Use null if req is null
-    location: req ? req.clientInfo.location : 'N/A', // Use null if req is null
-    deviceType: req ? req.clientInfo.deviceType : 'N/A', // Use null if req is null
+    affectedUserId: affectedUserName ? affectedUserName : "N/A", // Set the affectedUserName if applicable
+    ipAddress: req ? req.clientInfo.primaryIpAddress : "N/A", // Use null if req is null
+    userAgent: req ? req.clientInfo.userAgent : "N/A", // Use null if req is null
+    location: req ? req.clientInfo.location : "N/A", // Use null if req is null
+    deviceType: req ? req.clientInfo.deviceType : "N/A", // Use null if req is null
     createdAt: new Date(),
     AdminId: admin.id, // Link activity to the Admin performing the action
   };
@@ -55,4 +56,3 @@ exports.createAdminActivity = async (
     return await AdminActivity.create(activityData);
   }
 };
-

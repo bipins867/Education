@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const { saveFile } = require("../../../../../Utils/fileHandler");
 const path = require("path");
-const {
+const {sequelize,
   storageUseType,
   S3_FILE_PATH,
 } = require("../../../../../importantInfo");
@@ -11,13 +11,19 @@ const Series = require("../../../../../Models/TestSeries/Series");
 const Test = require("../../../../../Models/TestSeries/Test");
 const Question = require("../../../../../Models/TestSeries/Question");
 const Option = require("../../../../../Models/TestSeries/Option");
+const { createUserActivity } = require("../../../../../Utils/activityUtils");
+
+
 
 async function updateEntity(model, req, res, fields, filePath, typeId) {
+  let transaction;
   try {
     const updates = req.body;
     const imageFile = req.files?.image ? req.files.image[0] : null;
 
-    const entity = await model.findOne({ where: { id: req.body[typeId],UserId:req.user.id } });
+    const entity = await model.findOne({
+      where: { id: req.body[typeId], InstituteId: req.institute.id },
+    });
     if (!entity) {
       return res
         .status(404)
@@ -43,12 +49,25 @@ async function updateEntity(model, req, res, fields, filePath, typeId) {
         entity[key] = updates[key];
       }
     });
+    transaction = await sequelize.transaction();
 
-    await entity.save();
+    await entity.save({ transaction });
+    
+    await createUserActivity(
+      req,
+      "update",
+      `Entity updated successfully Id: ${entity.id}`,
+      transaction
+    );
+
+    await transaction.commit();
     return res
       .status(200)
       .json({ success: true, message: "Updated successfully", data: entity });
   } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
     console.log(error);
     return res
       .status(500)
