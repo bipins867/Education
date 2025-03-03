@@ -7,19 +7,20 @@ const { EXPIRE_TIME } = require("../../../importantInfo");
 
 exports.instituteLogin = async (req, res) => {
   try {
-    const { emailOrPhone, password } = req.body;
+    const { phone,instituteId } = req.body;
 
-    if (!emailOrPhone || !password) {
+    if (!phone || !instituteId) {
       return res.status(400).json({
         success: false,
-        message: "Email/Phone and password are required",
+        message: "Phone and instituteId are required",
       });
     }
 
     // Find institute by email or phone
     const institute = await Institute.findOne({
       where: {
-        [Op.or]: [{ email: emailOrPhone }, { phone: emailOrPhone }],
+        phone,
+        instituteId,
         isActive: true,
       },
     });
@@ -37,16 +38,6 @@ exports.instituteLogin = async (req, res) => {
         success: false,
         message:
           "Your institute account has been blocked. Please contact administrator.",
-      });
-    }
-
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, institute.password);
-
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
       });
     }
 

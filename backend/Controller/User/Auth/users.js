@@ -1,8 +1,10 @@
 const jwt = require("jsonwebtoken");
 const User = require("../../../Models/User/users");
-const {sequelize,EXPIRE_TIME} = require("../../../importantInfo");
+const { sequelize, EXPIRE_TIME } = require("../../../importantInfo");
 const InstUser = require("../../../Models/AndModels/InstUser");
 const Institute = require("../../../Models/Institute/institute");
+const Teacher = require("../../../Models/User/teacher");
+const Student = require("../../../Models/User/student");
 
 exports.studentAuth = async (req, res) => {
   let transaction;
@@ -59,14 +61,20 @@ exports.studentAuth = async (req, res) => {
       );
     }
 
+    if (instUser.userType === "teacher") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Teacher cannot login as student" });
+    }
+
     const token = jwt.sign(
       {
         id: user.id,
         userType: "student",
-        studentId: instUser.Student.id,
+        studentId: Student.id,
         phone: user.phone,
         instituteId: institute.id,
-        instUserId:instUser.id
+        instUserId: instUser.id,
       },
       process.env.JWT_SECRET_KEY,
       { expiresIn: EXPIRE_TIME }
@@ -98,9 +106,11 @@ exports.teacherAuth = async (req, res) => {
         .json({ success: false, message: "Missing required fields" });
     }
 
-    const institute = await Institute.findOne({where:{
-      instituteId
-    }});
+    const institute = await Institute.findOne({
+      where: {
+        instituteId,
+      },
+    });
     if (!institute) {
       return res
         .status(404)
@@ -120,23 +130,20 @@ exports.teacherAuth = async (req, res) => {
     });
 
     if (!instUser || !instUser.Teacher) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Teacher not found in this institute",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "Teacher not found in this institute",
+      });
     }
 
     const token = jwt.sign(
       {
-
         id: user.id,
-        userType:"teacher",
-        teacherId: instUser.Teacher.id,
+        userType: "teacher",
+        teacherId: Teacher.id,
         phone: user.phone,
         instituteId: institute.id,
-        instUserId:instUser.id
+        instUserId: instUser.id,
       },
       process.env.JWT_SECRET_KEY,
       { expiresIn: EXPIRE_TIME }
