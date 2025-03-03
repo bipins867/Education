@@ -100,7 +100,7 @@ exports.createSeries = async (req, res, next) => {
     const category = await Category.findOne({
       where: {
         id: CategoryId,
-        UserId: req.user.id,
+        InstituteId: req.institute.id,
       },
     });
     if (!category)
@@ -179,7 +179,7 @@ exports.createTest = async (req, res, next) => {
     const series = await Series.findOne({
       where: {
         id: SeriesId,
-        UserId: req.user.id,
+        InstituteId: req.institute.id,
       },
     });
     if (!series)
@@ -259,7 +259,7 @@ exports.createQuestion = async (req, res, next) => {
     const test = await Test.findOne({
       where: {
         id: TestId,
-        UserId: req.user.id,
+        InstituteId: req.institute.id,
       },
     });
     if (!test)
@@ -335,7 +335,7 @@ exports.createOption = async (req, res, next) => {
     const question = await Question.findOne({
       where: {
         id: QuestionId,
-        UserId: req.user.id,
+        InstituteId: req.institute.id,
       },
     });
     if (!question)

@@ -4,6 +4,7 @@ const User = require("../Models/User/users");
 const Institute = require("../Models/Institute/institute");
 const Student = require("../Models/User/student");
 const Teacher = require("../Models/User/teacher");
+const InstUser = require("../Models/AndModels/InstUser");
 
 exports.adminAuthentication = async (req, res, next) => {
   try {
@@ -88,7 +89,7 @@ exports.instituteAuthentication = async (req, res, next) => {
     }
 
     req.institute = institute;
-    req.userType = decodedData.type;
+    req.userType = decodedData.userType;
     next();
   } catch (error) {
     if (error.name === "JsonWebTokenError") {
@@ -126,17 +127,17 @@ exports.teacherAuthentication = async (req, res, next) => {
 
     // Verify token
     const decodedData = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-    if (decodedData.userType !== "teacher") {
+   
+    if (decodedData.userType == "student" || !decodedData.userType || !decodedData.instituteId) {
       return res.status(403).json({
         success: false,
-        message: "Unauthorized access. Teachers only.",
+        message: "Unauthorized access. Teachers and Institutes only.",
       });
     }
 
     const institute = await Institute.findOne({
       where: {
-        id: decodedData.instituteId,
+        InstituteId: decodedData.instituteId,
         isActive: true,
         isBlocked: false,
       },
@@ -146,6 +147,13 @@ exports.teacherAuthentication = async (req, res, next) => {
         success: false,
         message: "Institute not found or access denied",
       });
+    }
+
+    if (decodedData.userType === "institute") {
+      req.institute = institute;
+      req.userType = decodedData.userType;
+      next();
+      return;
     }
 
     const instUser = await InstUser.findOne({
@@ -170,7 +178,7 @@ exports.teacherAuthentication = async (req, res, next) => {
 
     const teacher = await Teacher.findOne({
       where: {
-        id: decodedData.teacherId,
+        id: decodedData.id,
       },
     });
 
@@ -196,11 +204,14 @@ exports.teacherAuthentication = async (req, res, next) => {
         message: "Invalid token",
       });
     }
-    if (error.name === "TokenExpiredError") {
+    else if (error.name === "TokenExpiredError") {
       return res.status(401).json({
         success: false,
         message: "Token expired",
       });
+    }
+    else{
+      console.log(error);
     }
     return res.status(500).json({
       success: false,
@@ -266,7 +277,7 @@ exports.studentAuthentication = async (req, res, next) => {
 
     const student = await Student.findOne({
       where: {
-        id: decodedData.studentId,
+        id: decodedData.id,
       },
     });
 

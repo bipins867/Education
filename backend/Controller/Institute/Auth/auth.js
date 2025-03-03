@@ -46,7 +46,7 @@ exports.instituteLogin = async (req, res) => {
       {
         id: institute.id,
         instituteId: institute.instituteId,
-        type: "institute",
+        userType: "institute",
       },
       process.env.JWT_SECRET_KEY,
       { expiresIn: EXPIRE_TIME }

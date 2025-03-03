@@ -26,7 +26,7 @@ exports.deleteCategory = async (req, res, next) => {
     }
 
     const category = await Category.findOne({
-      where: { id: id, UserId: req.user.id },
+      where: { id: id, InstituteId: req.institute.id },
     });
 
     if (!category) {
@@ -110,7 +110,7 @@ exports.deleteSeries = async (req, res, next) => {
         .json({ success: false, message: "Series ID is required" });
     }
     const series = await Series.findOne({
-      where: { id: id, UserId: req.user.id },
+      where: { id: id, InstituteId: req.institute.id },
     });
 
     if (!series) {
@@ -185,7 +185,7 @@ exports.deleteTest = async (req, res, next) => {
         .json({ success: false, message: "Test ID is required" });
     }
     const test = await Test.findOne({
-      where: { id: id, UserId: req.user.id },
+      where: { id: id, InstituteId: req.institute.id },
       transaction: t,
     });
 
@@ -252,7 +252,7 @@ exports.deleteQuestion = async (req, res, next) => {
         .json({ success: false, message: "Question ID is required" });
     }
     const question = await Question.findOne({
-      where: { id: id, UserId: req.user.id },
+      where: { id: id, InstituteId: req.institute.id },
     });
 
     if (!question) {
@@ -308,7 +308,7 @@ exports.deleteOption = async (req, res, next) => {
         .json({ success: false, message: "Option ID is required" });
     }
     const option = await Option.findOne({
-      where: { id: id, UserId: req.user.id },
+      where: { id: id, InstituteId: req.institute.id },
     });
 
     if (!option) {
