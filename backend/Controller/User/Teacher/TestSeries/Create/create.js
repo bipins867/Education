@@ -16,13 +16,17 @@ const Option = require("../../../../../Models/TestSeries/Option");
 exports.createCategory = async (req, res, next) => {
   try {
     const { name } = req.body;
-    const UserId = req.user.id;
+    const institute = req.institute;
+
+    const InstituteId = institute.id;
     const imageFile = req.files?.image ? req.files.image[0] : null;
 
-    if (!name)
-      return res
-        .status(400)
-        .json({ success: false, message: "Name is required" });
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Name is required",
+      });
+    }
 
     let imageData;
     if (imageFile) {
@@ -32,6 +36,7 @@ exports.createCategory = async (req, res, next) => {
         uuidv4()
       );
     }
+
     let imageUrl = "";
     if (imageData) {
       if (storageUseType === "supabase") {
@@ -44,7 +49,7 @@ exports.createCategory = async (req, res, next) => {
     const category = await Category.create({
       name,
       imageUrl,
-      UserId,
+      InstituteId,
     });
 
     return res.status(201).json({
@@ -53,10 +58,12 @@ exports.createCategory = async (req, res, next) => {
       data: category,
     });
   } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error", error });
+    console.error("Error creating category:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
 

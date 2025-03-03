@@ -8,10 +8,16 @@ const {
 const router = express.Router();
 
 router.post(
-  "/login",
+  "/studentLogin",
   // middlewareSendOtp,
   // middlewareVerifyOtp,
-  usersAuthController.userAuth
+  usersAuthController.studentAuth
 );
 
+router.post(
+  "/teacherLogin",
+  // middlewareSendOtp,
+  // middlewareVerifyOtp,
+  usersAuthController.teacherAuth
+);
 module.exports = router;

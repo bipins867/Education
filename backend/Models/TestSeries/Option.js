@@ -16,7 +16,7 @@ const Option = sequelize.define(
       allowNull: false,
       defaultValue: true,
     },
-    UserId: {
+    InstituteId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1,

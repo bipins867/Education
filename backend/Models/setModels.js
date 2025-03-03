@@ -1,30 +1,42 @@
-const StudentTeacher = require("./AndModels/StudentTeacher");
-const UserSeries = require("./AndModels/UserSeries");
-const UserSeriesTest = require("./AndModels/UserSeriesTest");
-const UserSeriesTestQuestion = require("./AndModels/UserSeriesTestQuestion");
-const Banner = require("./Banner/banner");
+const InstUser = require("./AndModels/InstUser");
+const Institute = require("./Institute/institute");
+const InstituteProfile = require("./Institute/instituteProfile");
 const Category = require("./TestSeries/Category");
 const Option = require("./TestSeries/Option");
 const Question = require("./TestSeries/Question");
 const Series = require("./TestSeries/Series");
 const Test = require("./TestSeries/Test");
+const AdminActivity = require("./User/adminActivity");
+const Admin = require("./User/admins");
 const Student = require("./User/student");
 const Teacher = require("./User/teacher");
-const UserActivity = require("./User/UserActivity");
+const UserActivity = require("./User/userActivity");
 const User = require("./User/users");
 
 exports.setupModels = () => {
-  User.hasMany(UserActivity);
-  UserActivity.belongsTo(User);
+  Admin.hasMany(AdminActivity);
+  AdminActivity.belongsTo(Admin);
 
-  User.hasOne(Student);
-  Student.belongsTo(User);
+  Institute.hasOne(InstituteProfile);
+  InstituteProfile.belongsTo(Institute);
 
-  User.hasOne(Teacher);
-  Teacher.belongsTo(User);
+  Institute.belongsToMany(User, { through: InstUser });
+  User.belongsToMany(Institute, { through: InstUser });
 
-  User.hasMany(Category);
-  Category.belongsTo(User);
+  InstUser.hasOne(Student);
+  Student.belongsTo(InstUser);
+
+  InstUser.hasOne(Teacher);
+  Teacher.belongsTo(InstUser);
+
+  InstUser.hasMany(UserActivity);
+  UserActivity.belongsTo(InstUser);
+
+  Institute.hasMany(UserActivity);
+  UserActivity.belongsTo(Institute);
+
+  Institute.hasMany(Category);
+  Category.belongsTo(Institute);
 
   Category.hasMany(Series);
   Series.belongsTo(Category);
@@ -37,28 +49,4 @@ exports.setupModels = () => {
 
   Question.hasMany(Option);
   Option.belongsTo(Question);
-
-  User.belongsToMany(Series, { through: UserSeries });
-  Series.belongsToMany(User, { through: UserSeries });
-
-  UserSeries.belongsToMany(Test, { through: UserSeriesTest });
-  Test.belongsToMany(UserSeries, { through: UserSeriesTest });
-
-  UserSeriesTest.belongsToMany(Question, { through: UserSeriesTestQuestion });
-  Question.belongsToMany(UserSeriesTest, { through: UserSeriesTestQuestion });
-
-  Student.belongsToMany(Teacher, { through: StudentTeacher });
-  Teacher.belongsToMany(Student, { through: StudentTeacher });
-
-  User.hasMany(Banner);
-  Banner.belongsTo(User);
-
-  Category.hasMany(Banner);
-  Banner.belongsTo(Category);
-
-  Series.hasMany(Banner);
-  Banner.belongsTo(Series);
-
-  Test.hasMany(Banner);
-  Banner.belongsTo(Test);
 };

@@ -24,7 +24,7 @@ const Series = sequelize.define(
       type: DataTypes.STRING,
     },
     description: { type: DataTypes.TEXT },
-    UserId: {
+    InstituteId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1,

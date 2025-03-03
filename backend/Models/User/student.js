@@ -10,7 +10,18 @@ const Student = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    
+    name: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    email: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    imageUrl: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
     rollNumber: {
       type: Sequelize.STRING,
       allowNull: true,
@@ -23,6 +34,11 @@ const Student = sequelize.define(
     section: {
       type: Sequelize.STRING,
       allowNull: true,
+    },
+    isDetailsUpdated: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
   },
   {

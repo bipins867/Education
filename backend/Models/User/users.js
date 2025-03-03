@@ -9,37 +9,11 @@ const User = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    name: {
-      type: Sequelize.STRING,
-      allowNull: true,
-    },
-    email: {
-      type: Sequelize.STRING,
-      allowNull: true,
-      unique: true, // Ensuring email uniqueness
-      validate: {
-        isEmail: true, // Validates email format
-      },
-    },
-    profileUrl: {
-      type: Sequelize.STRING,
-      allowNull: true,
-    },
-    isDetailsUpdated: {
-      type: Sequelize.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
 
     isBlocked: {
       type: Sequelize.BOOLEAN,
       allowNull: true,
       defaultValue: false,
-    },
-    userType: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      defaultValue: "student",
     },
 
     phone: {

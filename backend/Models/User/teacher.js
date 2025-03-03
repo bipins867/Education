@@ -8,10 +8,26 @@ const Teacher = sequelize.define(
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+    },name: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    email: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    imageUrl: {
+      type: Sequelize.STRING,
+      allowNull: true,
     },
     qualification: {
       type: Sequelize.STRING,
       allowNull: true,
+    },
+    isDetailsUpdated: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
   },
   {

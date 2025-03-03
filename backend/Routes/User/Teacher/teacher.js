@@ -2,12 +2,15 @@ const express = require("express");
 
 const testSeriesRouter = require("./TestSeries/testSeries");
 const profileRouter = require("./Profile/profile");
+const studentRouter = require("./Student/student");
 
-const { userAuthentication,teacherAuthentication } = require("../../../Middleware/auth");
+
+const { teacherAuthentication } = require("../../../Middleware/auth");
 
 const router = express.Router();
 
-router.use("/testSeries",userAuthentication, teacherAuthentication, testSeriesRouter);
-router.use("/profile",userAuthentication, teacherAuthentication, profileRouter);
+router.use("/testSeries", teacherAuthentication, testSeriesRouter);
+router.use("/profile", teacherAuthentication, profileRouter);
+router.use("/student", teacherAuthentication, studentRouter);
 
 module.exports = router;

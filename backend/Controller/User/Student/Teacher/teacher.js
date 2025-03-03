@@ -1,6 +1,10 @@
-const StudentTeacher = require("../../../Models/AndModels/StudentTeacher");
-const Student = require("../../../Models/User/student");
-const Teacher = require("../../../Models/User/teacher");
+
+const Student = require("../../../../Models/User/student");
+const Teacher = require("../../../../Models/User/teacher");
+const User = require("../../../../Models/User/users");
+
+
+
 
 exports.subscribeToTeacher = async (req, res) => {
   const { teacherId } = req.body;
@@ -21,6 +25,17 @@ exports.subscribeToTeacher = async (req, res) => {
         .json({ success: false, message: "Teacher or student not found" });
     }
 
+    const existingSubscription = await StudentTeacher.findOne({
+      where: {
+        StudentId: student.id,
+        TeacherId: teacher.id
+      }
+    });
+    if(existingSubscription){
+      return res.status(400).json({ success: false, message: "Already subscribed to this teacher" });
+    }
+    
+
     await StudentTeacher.create({
       StudentId: student.id,
       TeacherId: teacher.id,
@@ -34,19 +49,61 @@ exports.subscribeToTeacher = async (req, res) => {
 };
 
 exports.getSubscribedTeachers = async (req, res) => {
-  const studentId = req.user.id;
   try {
-    const student = await Student.findOne({ where: { UserId: studentId } });
+      const studentId = req.user.id;
+      
+      // First find the student record
+      const student = await Student.findOne({ 
+          where: { UserId: studentId }
+      });
 
-    const subscribedTeachers = await StudentTeacher.findAll({
-      where: { StudentId: student.id },
-      include: [{ model: Teacher, attributes: ["id", "name", "email"] }],
-    });
+      if (!student) {
+          return res.status(404).json({
+              success: false,
+              message: "Student not found"
+          });
+      }
 
-    res.status(200).json({ success: true, data: subscribedTeachers });
+      // Get teachers using the proper association
+      const subscribedTeachers = await Student.findOne({
+          where: { id: student.id },
+          include: [{
+              model: Teacher,
+              include: [{
+                  model: User,
+                  attributes: ['name', 'email', 'phone', 'profileUrl']
+              }]
+          }]
+      });
+      
+      if (!subscribedTeachers || !subscribedTeachers.Teachers) {
+          return res.status(200).json({
+              success: true,
+              data: []
+          });
+      }
+
+      // Format the response
+      const formattedTeachers = subscribedTeachers.Teachers.map(teacher => ({
+          id: teacher.id,
+          qualification: teacher.qualification,
+          name: teacher.User.name,
+          email: teacher.User.email,
+          phone: teacher.User.phone,
+          profileUrl: teacher.User.profileUrl
+      }));
+
+      res.status(200).json({
+          success: true,
+          data: formattedTeachers
+      });
+
   } catch (error) {
-    console.error("Error getting subscribed teachers:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+      console.error("Error getting subscribed teachers:", error);
+      res.status(500).json({
+          success: false,
+          message: "Internal server error"
+      });
   }
 };
 

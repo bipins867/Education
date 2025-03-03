@@ -22,7 +22,7 @@ const Question = sequelize.define(
       defaultValue: true,
     },
     weight: { type: DataTypes.FLOAT, allowNull: false, defaultValue: 1.0 },
-    UserId: {
+    InstituteId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1,
