@@ -116,7 +116,7 @@ exports.updateQuestion = (req, res) =>
     Question,
     req,
     res,
-    ["text", "weight", "TestId", "imageUrl"],
+    ["text", "weight", "TestId", "imageUrl",'correctOptionId'],
     "Questions",
     "QuestionId"
   );

@@ -35,7 +35,7 @@ const StudentTest = sequelize.define(
       defaultValue: 0,
     },
     timeTaken: {
-      type: DataTypes.INTEGER, // in seconds
+      type: DataTypes.STRING, // in seconds
       defaultValue: 0,
     },
     isCompleted: {

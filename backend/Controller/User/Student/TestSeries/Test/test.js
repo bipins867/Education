@@ -6,9 +6,14 @@ const Question = require("../../../../../Models/TestSeries/Question");
 exports.startTest = async (req, res) => {
   try {
     const { testId } = req.body;
+    if (!testId) {
+      return res.status(400).json({
+        message: "All fields are required - testId!",
+      });
+    }
     const student = req.student;
     const test = await Test.findOne({
-      where: { id: testId, InstitutionId: req.institute.id },
+      where: { id: testId, InstituteId: req.institute.id },
     });
     if (!test) {
       return res.status(404).json({
@@ -35,22 +40,45 @@ exports.startTest = async (req, res) => {
 exports.attemptQuestion = async (req, res) => {
   try {
     const { questionId, optionId, studentTestId } = req.body;
+    if (!questionId || !optionId || !studentTestId) {
+      return res.status(400).json({
+        message:
+          "All fields are required - questionId, optionId, studentTestId!",
+      });
+    }
     const student = req.student;
     const question = await Question.findOne({
-      where: { id: questionId, InstitutionId: req.institute.id },
+      where: { id: questionId, InstituteId: req.institute.id },
     });
     if (!question) {
       return res.status(404).json({
         message: "Question not found!",
       });
     }
-    const studentQuestion = await StudentQuestion.create({
-      StudentId: student.id,
-      QuestionId: question.id,
-      selectedOptionId: optionId,
-      StudentTestId: studentTestId,
-      isCorrect: optionId === question.correctOptionId,
+    let studentQuestion = await StudentQuestion.findOne({
+      where: {
+        StudentId: student.id,
+        QuestionId: question.id,
+        StudentTestId: studentTestId,
+      },
     });
+    if (!studentQuestion) {
+      studentQuestion = await StudentQuestion.create({
+        StudentId: student.id,
+        QuestionId: question.id,
+        selectedOptionId: optionId,
+        StudentTestId: studentTestId,
+        isCorrect: optionId === question.correctOptionId,
+      });
+    } else {
+      studentQuestion = await StudentQuestion.update(
+        {
+          selectedOptionId: optionId,
+          isCorrect: optionId === question.correctOptionId,
+        },
+        { where: { id: studentQuestion.id } }
+      );
+    }
     res.status(200).json({
       message: "Question attempted successfully",
       success: true,
@@ -67,6 +95,11 @@ exports.attemptQuestion = async (req, res) => {
 exports.submitTest = async (req, res) => {
   try {
     const { studentTestId } = req.body;
+    if (!studentTestId) {
+      return res.status(400).json({
+        message: "All fields are required - studentTestId!",
+      });
+    }
     const studentTest = await StudentTest.findOne({
       where: { id: studentTestId, StudentId: req.student.id },
     });
@@ -75,8 +108,13 @@ exports.submitTest = async (req, res) => {
         message: "Student test not found!",
       });
     }
+    if (studentTest.isCompleted) {
+      return res.status(400).json({
+        message: "Test already submitted!",
+      });
+    }
     const totalQuestions = await Question.count({
-      where: { TestId: studentTest.TestId, InstitutionId: req.institute.id },
+      where: { TestId: studentTest.TestId, InstituteId: req.institute.id },
     });
 
     const totalAttempted = await StudentQuestion.count({
@@ -91,7 +129,7 @@ exports.submitTest = async (req, res) => {
       },
     });
 
-    const totalIncorrect = totalQuestions - totalAttempted;
+    const totalIncorrect = totalQuestions - totalCorrect;
     const totalScore = (totalCorrect * 100) / totalQuestions;
 
     await StudentTest.update(
@@ -102,7 +140,7 @@ exports.submitTest = async (req, res) => {
         wrongAnswers: totalIncorrect,
         totalScore: totalScore,
         timeTaken:
-          new Date(studentTest.endTime).getTime() -
+          new Date().getTime() -
           new Date(studentTest.startTime).getTime(),
         isCompleted: true,
       },
@@ -124,9 +162,14 @@ exports.submitTest = async (req, res) => {
 exports.getTestResults = async (req, res) => {
   try {
     const { testId } = req.body;
+    if (!testId) {
+      return res.status(400).json({
+        message: "All fields are required - testId!",
+      });
+    }
     const student = req.student;
     const test = await Test.findOne({
-      where: { id: testId, InstitutionId: req.institute.id },
+      where: { id: testId, InstituteId: req.institute.id },
     });
     if (!test) {
       return res.status(404).json({
