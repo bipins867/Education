@@ -18,6 +18,10 @@ const StudentQuestion = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+    StudentTestId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   {
     timestamps: true,
