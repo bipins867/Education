@@ -170,7 +170,7 @@ exports.studentAuthentication = async (req, res, next) => {
 
     const student = await Student.findOne({
       where: {
-        id: decodedData.id,
+        id: decodedData.studentId,
       },
     });
 
@@ -210,7 +210,6 @@ exports.studentAuthentication = async (req, res, next) => {
   }
 };
 
-
 exports.teacherAuthentication = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
@@ -224,8 +223,12 @@ exports.teacherAuthentication = async (req, res, next) => {
 
     // Verify token
     const decodedData = jwt.verify(token, process.env.JWT_SECRET_KEY);
-   
-    if (decodedData.userType == "student" || !decodedData.userType || !decodedData.instituteId) {
+
+    if (
+      decodedData.userType == "student" ||
+      !decodedData.userType ||
+      !decodedData.instituteId
+    ) {
       return res.status(403).json({
         success: false,
         message: "Unauthorized access. Teachers and Institutes only.",
@@ -275,7 +278,7 @@ exports.teacherAuthentication = async (req, res, next) => {
 
     const teacher = await Teacher.findOne({
       where: {
-        id: decodedData.id,
+        id: decodedData.teacherId,
       },
     });
 
@@ -300,14 +303,12 @@ exports.teacherAuthentication = async (req, res, next) => {
         success: false,
         message: "Invalid token",
       });
-    }
-    else if (error.name === "TokenExpiredError") {
+    } else if (error.name === "TokenExpiredError") {
       return res.status(401).json({
         success: false,
         message: "Token expired",
       });
-    }
-    else{
+    } else {
       console.log(error);
     }
     return res.status(500).json({
@@ -317,4 +318,3 @@ exports.teacherAuthentication = async (req, res, next) => {
     });
   }
 };
-

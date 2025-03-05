@@ -2,20 +2,7 @@ const Teacher = require("../../../../Models/User/teacher");
 
 exports.getProfile = async (req, res, next) => {
   try {
-    const user = req.user; // Authenticated user
-    if (user.userType !== "teacher") {
-      return res
-        .status(403)
-        .json({ success: false, message: "Unauthorized access" });
-    }
-    // Try to fetch the existing teacher profile
-    let teacher = await user.getTeacher();
-
-    // If no profile exists, create a new one
-    if (!teacher) {
-      teacher = await Teacher.create({ UserId: user.id });
-    }
-
+    const teacher = await req.instUser.getTeacher();
     res.status(200).json({ success: true, data: teacher });
   } catch (error) {
     console.error("Error fetching teacher profile:", error);

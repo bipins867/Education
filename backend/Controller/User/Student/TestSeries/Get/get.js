@@ -5,12 +5,12 @@ const Question = require("../../../../../Models/TestSeries/Question");
 const Option = require("../../../../../Models/TestSeries/Option");
 
 exports.getCategories = async (req, res) => {
-  const { teacherId } = req.body;
+  
   try {
     const categories = await Category.findAll({
       where: {
         isActive: true,
-        UserId: teacherId,
+        InstituteId: req.institute.id,
       },
     });
     res.status(200).json({ success: true, data: categories });
@@ -27,6 +27,7 @@ exports.getSeries = async (req, res) => {
       where: {
         isActive: true,
         CategoryId: categoryId,
+        InstituteId: req.institute.id,
       },
     });
     res.status(200).json({ success: true, data: series });
@@ -36,13 +37,14 @@ exports.getSeries = async (req, res) => {
   }
 };
 
-exports.getTest = async (req, res) => {
+exports.getTests = async (req, res) => {
   const { seriesId } = req.body;
   try {
     const test = await Test.findAll({
       where: {
         isActive: true,
         SeriesId: seriesId,
+        InstituteId: req.institute.id,
       },
     });
     res.status(200).json({ success: true, data: test });
@@ -52,13 +54,14 @@ exports.getTest = async (req, res) => {
   }
 };
 
-exports.getQuestion = async (req, res) => {
+exports.getQuestions = async (req, res) => {
   const { testId } = req.body;
   try {
     const question = await Question.findAll({
       where: {
         isActive: true,
         TestId: testId,
+        InstituteId: req.institute.id,
       },
       include: [
         {
@@ -74,13 +77,14 @@ exports.getQuestion = async (req, res) => {
   }
 };
 
-exports.getOption = async (req, res) => {
+exports.getOptions = async (req, res) => {
   const { questionId } = req.body;
   try {
     const option = await Option.findAll({
       where: {
         isActive: true,
         QuestionId: questionId,
+        InstituteId: req.institute.id,
       },
     });
     res.status(200).json({ success: true, data: option });

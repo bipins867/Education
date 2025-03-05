@@ -16,7 +16,7 @@ exports.studentAuth = async (req, res) => {
         .status(400)
         .json({ success: false, message: "All fields are required" });
     }
-   
+
     const institute = await Institute.findOne({
       where: { instituteId: instituteId },
     });
@@ -40,7 +40,9 @@ exports.studentAuth = async (req, res) => {
 
     let instUser = await InstUser.findOne({
       where: { InstituteId: institute.id, UserId: user.id },
+      include: [Student],
     });
+    let student;
     if (!instUser) {
       instUser = await InstUser.create(
         {
@@ -51,7 +53,7 @@ exports.studentAuth = async (req, res) => {
         { transaction }
       );
 
-      await Student.create(
+      student = await Student.create(
         {
           phone,
 
@@ -59,8 +61,9 @@ exports.studentAuth = async (req, res) => {
         },
         { transaction }
       );
+    } else {
+      student = instUser.Student;
     }
-
     if (instUser.userType === "teacher") {
       return res
         .status(400)
@@ -71,7 +74,7 @@ exports.studentAuth = async (req, res) => {
       {
         id: user.id,
         userType: "student",
-        studentId: Student.id,
+        studentId: student.id,
         phone: user.phone,
         instituteId: institute.instituteId,
         instUserId: instUser.id,
@@ -79,7 +82,6 @@ exports.studentAuth = async (req, res) => {
       process.env.JWT_SECRET_KEY,
       { expiresIn: EXPIRE_TIME }
     );
-
     await transaction.commit();
 
     return res
@@ -140,7 +142,7 @@ exports.teacherAuth = async (req, res) => {
       {
         id: user.id,
         userType: "teacher",
-        teacherId: Teacher.id,
+        teacherId: instUser.Teacher.id,
         phone: user.phone,
         instituteId: institute.instituteId,
         instUserId: instUser.id,

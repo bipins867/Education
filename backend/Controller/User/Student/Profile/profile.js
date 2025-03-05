@@ -1,27 +1,10 @@
-const Student = require("../../../../Models/User/student");
+
 
 exports.getProfile = async (req, res, next) => {
   try {
+    const student = await req.instUser.getStudent();
     
-    const user = req.user; // Authenticated user
-
-    if (user.userType !== "student") {
-      return res
-        .status(403)
-        .json({ success: false, message: "Unauthorized access" });
-    }
-    // Try to fetch the existing student profile
-    let student = await user.getStudent();
-
-    // If no profile exists, create a new one
-    if (!student) {
-      student = await Student.create({ UserId: user.id });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: student,
-    });
+    res.status(200).json({ success: true, data: student });
   } catch (error) {
     console.error("Error fetching student profile:", error);
     res.status(500).json({
