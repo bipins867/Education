@@ -65,7 +65,7 @@ exports.instituteAuthentication = async (req, res, next) => {
     // Verify token
     const decodedData = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-    if (decodedData.type !== "institute") {
+    if (decodedData.userType !== "institute") {
       return res.status(403).json({
         success: false,
         message: "Unauthorized access",
