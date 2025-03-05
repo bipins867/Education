@@ -16,7 +16,7 @@ exports.studentAuth = async (req, res) => {
         .status(400)
         .json({ success: false, message: "All fields are required" });
     }
-
+   
     const institute = await Institute.findOne({
       where: { instituteId: instituteId },
     });

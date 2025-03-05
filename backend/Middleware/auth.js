@@ -75,7 +75,7 @@ exports.instituteAuthentication = async (req, res, next) => {
     // Get institute details
     const institute = await Institute.findOne({
       where: {
-        id: decodedData.id,
+        instituteId: decodedData.instituteId,
         isActive: true,
         isBlocked: false,
       },
@@ -114,6 +114,103 @@ exports.instituteAuthentication = async (req, res, next) => {
 
 // ... existing imports and middleware ...
 
+exports.studentAuthentication = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization;
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Please login to access this resource",
+      });
+    }
+
+    // Verify token
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    if (decodedData.userType !== "student") {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access. Students only.",
+      });
+    }
+
+    const institute = await Institute.findOne({
+      where: {
+        instituteId: decodedData.instituteId,
+        isActive: true,
+        isBlocked: false,
+      },
+    });
+    if (!institute) {
+      return res.status(401).json({
+        success: false,
+        message: "Institute not found or access denied",
+      });
+    }
+    const instUser = await InstUser.findOne({
+      where: {
+        id: decodedData.instUserId,
+      },
+    });
+    // Get user and student details
+    const user = await User.findOne({
+      where: {
+        id: decodedData.id,
+        isBlocked: false,
+      },
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found or access denied",
+      });
+    }
+
+    const student = await Student.findOne({
+      where: {
+        id: decodedData.id,
+      },
+    });
+
+    if (!student) {
+      return res.status(401).json({
+        success: false,
+        message: "Student profile not found",
+      });
+    }
+
+    // Add user and student to request object
+    req.user = user;
+    req.student = student;
+    req.instituteId = decodedData.instituteId;
+    req.institute = institute;
+    req.instUser = instUser;
+    req.userType = decodedData.userType;
+    next();
+  } catch (error) {
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message: "Token expired",
+      });
+    }
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+
 exports.teacherAuthentication = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
@@ -137,7 +234,7 @@ exports.teacherAuthentication = async (req, res, next) => {
 
     const institute = await Institute.findOne({
       where: {
-        InstituteId: decodedData.instituteId,
+        instituteId: decodedData.instituteId,
         isActive: true,
         isBlocked: false,
       },
@@ -221,98 +318,3 @@ exports.teacherAuthentication = async (req, res, next) => {
   }
 };
 
-exports.studentAuthentication = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization;
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Please login to access this resource",
-      });
-    }
-
-    // Verify token
-    const decodedData = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-    if (decodedData.userType !== "student") {
-      return res.status(403).json({
-        success: false,
-        message: "Unauthorized access. Students only.",
-      });
-    }
-
-    const institute = await Institute.findOne({
-      where: {
-        id: decodedData.instituteId,
-        isActive: true,
-        isBlocked: false,
-      },
-    });
-    if (!institute) {
-      return res.status(401).json({
-        success: false,
-        message: "Institute not found or access denied",
-      });
-    }
-    const instUser = await InstUser.findOne({
-      where: {
-        id: decodedData.instUserId,
-      },
-    });
-    // Get user and student details
-    const user = await User.findOne({
-      where: {
-        id: decodedData.id,
-        isBlocked: false,
-      },
-    });
-
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "User not found or access denied",
-      });
-    }
-
-    const student = await Student.findOne({
-      where: {
-        id: decodedData.id,
-      },
-    });
-
-    if (!student) {
-      return res.status(401).json({
-        success: false,
-        message: "Student profile not found",
-      });
-    }
-
-    // Add user and student to request object
-    req.user = user;
-    req.student = student;
-    req.instituteId = decodedData.instituteId;
-    req.institute = institute;
-    req.instUser = instUser;
-    req.userType = decodedData.userType;
-    next();
-  } catch (error) {
-    if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid token",
-      });
-    }
-    if (error.name === "TokenExpiredError") {
-      return res.status(401).json({
-        success: false,
-        message: "Token expired",
-      });
-    }
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-};
