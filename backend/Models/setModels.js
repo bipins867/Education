@@ -1,4 +1,7 @@
 const InstUser = require("./AndModels/InstUser");
+const StudentQuestion = require("./AndModels/StudentQuestion");
+const StudentSeries = require("./AndModels/StudentSeries");
+const StudentTest = require("./AndModels/StudentTest");
 const Institute = require("./Institute/institute");
 const InstituteProfile = require("./Institute/instituteProfile");
 const Category = require("./TestSeries/Category");
@@ -49,4 +52,13 @@ exports.setupModels = () => {
 
   Question.hasMany(Option);
   Option.belongsTo(Question);
+
+  Student.belongsToMany(Series, { through: StudentSeries });
+  Series.belongsToMany(Student, { through: StudentSeries });
+
+  Student.belongsToMany(Test, { through: StudentTest });
+  Test.belongsToMany(Student, { through: StudentTest });
+  
+  Student.belongsToMany(Question, { through: StudentQuestion });
+  Question.belongsToMany(Student, { through: StudentQuestion });
 };

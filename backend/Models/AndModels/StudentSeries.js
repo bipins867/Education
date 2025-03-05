@@ -3,8 +3,8 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../../importantInfo");
 
-const UserSeries = sequelize.define(
-  "UserSeries",
+const StudentSeries = sequelize.define(
+  "StudentSeries",
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     isPurchased: {
@@ -12,11 +12,21 @@ const UserSeries = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+    validity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      comment: "in days",
+    },
+    purchasedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields
-    tableName: "UserSeries", // Optional: specify table name if different from model name
+    tableName: "studentSeries", // Optional: specify table name if different from model name
   }
 );
 
-module.exports = UserSeries;
+module.exports = StudentSeries;
