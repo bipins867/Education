@@ -74,7 +74,7 @@ setupModels();
 //app.listen(process.env.APP_PORT);
 
 sequelize
-  .sync({ alter: true })
+  .sync()
   .then(() => {
     app.listen(process.env.APP_PORT);
     console.log(`Lisining to the port : ${process.env.APP_PORT}`);
