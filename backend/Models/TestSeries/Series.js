@@ -32,7 +32,7 @@ const Series = sequelize.define(
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields
-    tableName: "Series", // Optional: specify table name if different from model name
+    tableName: "series", // Optional: specify table name if different from model name
   }
 );
 
