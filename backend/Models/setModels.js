@@ -2,6 +2,7 @@ const InstUser = require("./AndModels/InstUser");
 const StudentQuestion = require("./AndModels/StudentQuestion");
 const StudentSeries = require("./AndModels/StudentSeries");
 const StudentTest = require("./AndModels/StudentTest");
+const Banner = require("./Banner/Banner");
 const Institute = require("./Institute/institute");
 const InstituteProfile = require("./Institute/instituteProfile");
 const Category = require("./TestSeries/Category");
@@ -61,4 +62,17 @@ exports.setupModels = () => {
   
   Student.belongsToMany(Question, { through: StudentQuestion });
   Question.belongsToMany(Student, { through: StudentQuestion });
+
+  Institute.hasMany(Banner);
+  Banner.belongsTo(Institute);
+
+  Category.hasMany(Banner);
+  Banner.belongsTo(Category);
+
+  Series.hasMany(Banner);
+  Banner.belongsTo(Series);
+
+  
+  
+  
 };

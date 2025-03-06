@@ -28,7 +28,7 @@ const Banner = sequelize.define(
     isActive: { 
       type: DataTypes.BOOLEAN, 
       defaultValue: true 
-    }
+    },
   },
   { 
     timestamps: true, 
